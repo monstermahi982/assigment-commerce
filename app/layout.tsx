@@ -4,6 +4,7 @@ import { ReduxProvider } from "../store/provider";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import GlobalLoader from "@/components/GlobalLoader";
+import { Toaster } from "@/components/ui/toaster";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -25,6 +26,7 @@ export default function RootLayout({
             <main className="flex-1">{children}</main>
             <Footer />
           </div>
+          <Toaster />
         </ReduxProvider>
         ;
       </body>

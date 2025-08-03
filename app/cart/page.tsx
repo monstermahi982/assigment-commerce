@@ -1,22 +1,42 @@
-'use client';
+"use client";
 
-import { motion } from 'framer-motion';
-import Link from 'next/link';
-import Image from 'next/image';
-import { useAppSelector } from '@/lib/hooks';
-import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
-import { ShoppingBag, Minus, Plus, X, ArrowRight } from 'lucide-react';
+import { motion } from "framer-motion";
+import Link from "next/link";
+import Image from "next/image";
+import { useAppSelector } from "@/lib/hooks";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { ShoppingBag, Minus, Plus, X, ArrowRight } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useToast } from "@/hooks/use-toast";
 
 export default function CartPage() {
   const { items, isLoading } = useAppSelector((state) => state.cart);
+  const { isAuthenticated } = useAppSelector((state) => state.auth);
+  const router = useRouter();
+  const { toast } = useToast();
 
-  const subtotal = items.reduce((total, item) => 
-    total + (item.variant.pricing.price.gross.amount * item.quantity), 0
+  const subtotal = items.reduce(
+    (total, item) =>
+      total + item.variant.pricing.price.gross.amount * item.quantity,
+    0
   );
 
   const shipping = 0; // Free shipping
   const total = subtotal + shipping;
+
+  const redirectToCheckout = () => {
+    if (!isAuthenticated) {
+      toast({
+        title: "Error! ❌",
+        description: "Please login to checkout your products",
+        variant: "destructive",
+        duration: 4000,
+      });
+      return;
+    }
+    router.push("/checkout");
+  };
 
   if (items.length === 0) {
     return (
@@ -29,10 +49,17 @@ export default function CartPage() {
           <div className="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-6">
             <ShoppingBag className="w-12 h-12 text-gray-400" />
           </div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Your Cart is Empty</h2>
-          <p className="text-gray-600 mb-8">Add some beautiful jewelry pieces to get started!</p>
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">
+            Your Cart is Empty
+          </h2>
+          <p className="text-gray-600 mb-8">
+            Add some beautiful jewelry pieces to get started!
+          </p>
           <Link href="/products">
-            <Button size="lg" className="bg-[#CF00FF] hover:bg-[#B800E6] text-white">
+            <Button
+              size="lg"
+              className="bg-[#CF00FF] hover:bg-[#B800E6] text-white"
+            >
               Shop Collection
               <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
@@ -54,7 +81,7 @@ export default function CartPage() {
             Shopping Cart
           </h1>
           <p className="text-gray-600">
-            {items.length} {items.length === 1 ? 'item' : 'items'} in your cart
+            {items.length} {items.length === 1 ? "item" : "items"} in your cart
           </p>
         </motion.div>
 
@@ -71,7 +98,10 @@ export default function CartPage() {
               >
                 <div className="w-full sm:w-32 h-32 relative overflow-hidden rounded-lg bg-gray-100">
                   <Image
-                    src={item.variant.product.thumbnail?.url || 'https://images.pexels.com/photos/1927259/pexels-photo-1927259.jpeg'}
+                    src={
+                      item.variant.product.thumbnail?.url ||
+                      "https://images.pexels.com/photos/1927259/pexels-photo-1927259.jpeg"
+                    }
                     alt={item.variant.product.name}
                     fill
                     className="object-cover"
@@ -84,7 +114,11 @@ export default function CartPage() {
                       <h3 className="text-lg font-semibold text-gray-900">
                         {item.variant.product.name}
                       </h3>
-                      <Button variant="ghost" size="icon" className="text-gray-400 hover:text-red-500">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="text-gray-400 hover:text-red-500"
+                      >
                         <X className="w-5 h-5" />
                       </Button>
                     </div>
@@ -96,18 +130,26 @@ export default function CartPage() {
                       <Button variant="outline" size="icon" className="w-8 h-8">
                         <Minus className="w-4 h-4" />
                       </Button>
-                      <span className="w-12 text-center font-semibold">{item.quantity}</span>
+                      <span className="w-12 text-center font-semibold">
+                        {item.quantity}
+                      </span>
                       <Button variant="outline" size="icon" className="w-8 h-8">
                         <Plus className="w-4 h-4" />
                       </Button>
                     </div>
-                    
+
                     <div className="text-right">
                       <p className="text-xl font-bold text-[#B800E6]">
-                        ₹{(item.variant.pricing.price.gross.amount * item.quantity).toLocaleString()}
+                        ₹
+                        {(
+                          item.variant.pricing.price.gross.amount *
+                          item.quantity
+                        ).toLocaleString()}
                       </p>
                       <p className="text-sm text-gray-500">
-                        ₹{item.variant.pricing.price.gross.amount.toLocaleString()} each
+                        ₹
+                        {item.variant.pricing.price.gross.amount.toLocaleString()}{" "}
+                        each
                       </p>
                     </div>
                   </div>
@@ -123,37 +165,51 @@ export default function CartPage() {
             transition={{ delay: 0.3 }}
             className="bg-white rounded-xl shadow-sm p-6 h-fit sticky top-24"
           >
-            <h2 className="text-xl font-semibold text-gray-900 mb-6">Order Summary</h2>
-            
+            <h2 className="text-xl font-semibold text-gray-900 mb-6">
+              Order Summary
+            </h2>
+
             <div className="space-y-4">
               <div className="flex justify-between">
                 <span className="text-gray-600">Subtotal</span>
-                <span className="font-semibold">₹{subtotal.toLocaleString()}</span>
+                <span className="font-semibold">
+                  ₹{subtotal.toLocaleString()}
+                </span>
               </div>
-              
+
               <div className="flex justify-between">
                 <span className="text-gray-600">Shipping</span>
                 <span className="font-semibold text-green-600">Free</span>
               </div>
-              
+
               <Separator />
-              
+
               <div className="flex justify-between text-lg">
                 <span className="font-semibold text-gray-900">Total</span>
-                <span className="font-bold text-[#B800E6]">₹{total.toLocaleString()}</span>
+                <span className="font-bold text-[#B800E6]">
+                  ₹{total.toLocaleString()}
+                </span>
               </div>
             </div>
 
             <div className="mt-6 space-y-3">
-              <Link href="/checkout">
-                <Button size="lg" className="mb-3 w-full bg-[#CF00FF] hover:bg-[#B800E6] text-white py-4 text-lg">
-                  Proceed to Checkout
-                  <ArrowRight className="w-5 h-5 ml-2" />
-                </Button>
-              </Link>
-              
+              {/* <Link href="/checkout"> */}
+              <Button
+                onClick={redirectToCheckout}
+                size="lg"
+                className="mb-3 w-full bg-[#CF00FF] hover:bg-[#B800E6] text-white py-4 text-lg"
+              >
+                Proceed to Checkout
+                <ArrowRight className="w-5 h-5 ml-2" />
+              </Button>
+              {/* </Link> */}
+
               <Link href="/products">
-                <Button variant="outline" size="lg" className="w-full py-4 text-lg">
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="w-full py-4 text-lg"
+                >
                   Continue Shopping
                 </Button>
               </Link>
