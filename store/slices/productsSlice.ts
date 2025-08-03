@@ -144,7 +144,8 @@ export const fetchProducts = createAsyncThunk(
         `,
           variables: {
             first,
-            filters: attributeFilters,
+            filter: filters,
+            channel: "online-inr",
           },
         }),
       }

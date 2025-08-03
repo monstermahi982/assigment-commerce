@@ -8,7 +8,7 @@ import {
   setFilters,
 } from "@/store/slices/productsSlice";
 import { ProductCard } from "@/components/products/ProductCard";
-import { ProductFilters } from "@/components/products/ProductFilters";
+import ProductFilters from "@/components/products/ProductFilters";
 import { Filter, Grid, List } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -19,6 +19,10 @@ export default function ProductsPage() {
   const { products, isLoading, error, filters } = useAppSelector(
     (state) => state.products
   );
+
+  const handleFiltersChange = (data: Record<string, string[]>) => {
+    dispatch(fetchProducts({ filters: data }));
+  }
 
   useEffect(() => {
     dispatch(fetchProducts({ filters }));
@@ -89,7 +93,7 @@ export default function ProductsPage() {
                 exit={{ x: -300, opacity: 0 }}
                 className="lg:w-80"
               >
-                <ProductFilters />
+                <ProductFilters onFiltersChange={handleFiltersChange} />
               </motion.aside>
             )}
           </AnimatePresence>
