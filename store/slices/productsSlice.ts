@@ -106,7 +106,7 @@ export const fetchProducts = createAsyncThunk(
     }
 
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:8000"}/graphql`,
+      `${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:8000"}/graphql/`,
       {
         method: "POST",
         headers: {
@@ -184,7 +184,7 @@ export const fetchProductBySlug = createAsyncThunk(
   "products/fetchProductBySlug",
   async ({ slug }: { slug: string }) => {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:8000"}/graphql`,
+      `${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:8000"}/graphql/`,
       {
         method: "POST",
         headers: {
