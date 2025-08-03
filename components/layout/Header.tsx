@@ -38,7 +38,7 @@ export function Header() {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link href="/" className="flex items-center space-x-2">
+          <Link href="/products" className="flex items-center space-x-2">
             <motion.div
               whileHover={{ scale: 1.05 }}
               className="w-10 h-10 bg-gradient-to-br from-[#CF00FF] to-[#9A00CC] rounded-xl flex items-center justify-center text-white font-bold text-lg"

@@ -102,7 +102,7 @@ export default function CheckoutPage() {
                   step.completed 
                     ? 'bg-green-500 text-white' 
                     : currentStep === step.number 
-                      ? 'bg-primary-500 text-white' 
+                      ? 'bg-[#CF00FF] text-white' 
                       : 'bg-gray-200 text-gray-500'
                 }`}>
                   {step.completed ? <Check className="w-5 h-5" /> : step.number}
@@ -232,7 +232,7 @@ export default function CheckoutPage() {
                     </RadioGroup>
                   </div>
 
-                  <Button type="submit" size="lg" className="w-full bg-primary-500 hover:bg-primary-600 text-white py-4">
+                  <Button type="submit" size="lg" className="w-full bg-[#CF00FF] hover:bg-[#B800E6] text-white py-4">
                     Continue to Payment
                   </Button>
                 </form>
@@ -318,7 +318,7 @@ export default function CheckoutPage() {
                     >
                       Back
                     </Button>
-                    <Button type="submit" size="lg" className="flex-1 bg-primary-500 hover:bg-primary-600 text-white">
+                    <Button type="submit" size="lg" className="flex-1 bg-[#CF00FF] hover:bg-[#B800E6] text-white">
                       Complete Order
                     </Button>
                   </div>
@@ -346,7 +346,7 @@ export default function CheckoutPage() {
                   <p className="text-lg font-semibold text-gray-900">#KMB-{Date.now().toString().slice(-6)}</p>
                 </div>
 
-                <Button size="lg" className="bg-primary-500 hover:bg-primary-600 text-white">
+                <Button size="lg" className="bg-[#CF00FF] hover:bg-[#B800E6] text-white">
                   Track Your Order
                 </Button>
               </motion.div>
@@ -367,14 +367,14 @@ export default function CheckoutPage() {
               {items.map((item) => (
                 <div key={item.id} className="flex items-center space-x-4">
                   <div className="w-16 h-16 relative overflow-hidden rounded-lg bg-gray-100">
-                    {item.variant.product.thumbnail && (
+                    {/* {item.variant.product.thumbnail && (
                       <Image
                         src={item.variant.product.thumbnail.url}
                         alt={item.variant.product.name}
                         fill
                         className="object-cover"
                       />
-                    )}
+                    )} */}
                   </div>
                   <div className="flex-1">
                     <h4 className="font-medium text-gray-900 text-sm line-clamp-1">
@@ -413,7 +413,7 @@ export default function CheckoutPage() {
               
               <div className="flex justify-between text-lg">
                 <span className="font-semibold text-gray-900">Total</span>
-                <span className="font-bold text-primary-600">₹{total.toLocaleString()}</span>
+                <span className="font-bold text-[#B800E6]">₹{total.toLocaleString()}</span>
               </div>
             </div>
 
@@ -424,7 +424,7 @@ export default function CheckoutPage() {
                 <span>SSL Encrypted Checkout</span>
               </div>
               <div className="flex items-center space-x-2">
-                <Truck className="w-4 h-4 text-primary-500" />
+                <Truck className="w-4 h-4 text-[#CF00FF]" />
                 <span>Free Returns within 30 days</span>
               </div>
             </div>

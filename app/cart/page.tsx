@@ -32,7 +32,7 @@ export default function CartPage() {
           <h2 className="text-2xl font-bold text-gray-900 mb-4">Your Cart is Empty</h2>
           <p className="text-gray-600 mb-8">Add some beautiful jewelry pieces to get started!</p>
           <Link href="/products">
-            <Button size="lg" className="bg-primary-500 hover:bg-primary-600 text-white">
+            <Button size="lg" className="bg-[#CF00FF] hover:bg-[#B800E6] text-white">
               Shop Collection
               <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
@@ -103,7 +103,7 @@ export default function CartPage() {
                     </div>
                     
                     <div className="text-right">
-                      <p className="text-xl font-bold text-primary-600">
+                      <p className="text-xl font-bold text-[#B800E6]">
                         ₹{(item.variant.pricing.price.gross.amount * item.quantity).toLocaleString()}
                       </p>
                       <p className="text-sm text-gray-500">
@@ -140,13 +140,13 @@ export default function CartPage() {
               
               <div className="flex justify-between text-lg">
                 <span className="font-semibold text-gray-900">Total</span>
-                <span className="font-bold text-primary-600">₹{total.toLocaleString()}</span>
+                <span className="font-bold text-[#B800E6]">₹{total.toLocaleString()}</span>
               </div>
             </div>
 
             <div className="mt-6 space-y-3">
               <Link href="/checkout">
-                <Button size="lg" className="w-full bg-primary-500 hover:bg-primary-600 text-white py-4 text-lg">
+                <Button size="lg" className="mb-3 w-full bg-[#CF00FF] hover:bg-[#B800E6] text-white py-4 text-lg">
                   Proceed to Checkout
                   <ArrowRight className="w-5 h-5 ml-2" />
                 </Button>
