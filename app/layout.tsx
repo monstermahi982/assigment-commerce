@@ -3,6 +3,7 @@ import "./globals.css";
 import { ReduxProvider } from "../store/provider";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
+import GlobalLoader from "@/components/GlobalLoader";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -16,12 +17,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`antialiased`}
-      >
+      <body className={`antialiased`}>
         <ReduxProvider>
           <div className="flex flex-col min-h-screen">
             <Header />
+            <GlobalLoader />
             <main className="flex-1">{children}</main>
             <Footer />
           </div>

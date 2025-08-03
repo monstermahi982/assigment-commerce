@@ -1,22 +1,35 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
-import Image from 'next/image';
-import { useParams } from 'next/navigation';
-import { useAppDispatch, useAppSelector } from '@/lib/hooks';
-import { fetchProductBySlug } from '@/store/slices/productsSlice';
-import { createCheckout } from '@/store/slices/cartSlice';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ShoppingBag, Star, Minus, Plus, Truck, Shield, RotateCcw } from 'lucide-react';
-import { ProductDetailPageSkeleton } from '@/components/products/ProductDetailPageSkeleton';
+import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
+import Image from "next/image";
+import { useParams } from "next/navigation";
+import { useAppDispatch, useAppSelector } from "@/lib/hooks";
+import { fetchProductBySlug } from "@/store/slices/productsSlice";
+import { createCheckout } from "@/store/slices/cartSlice";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  ShoppingBag,
+  Star,
+  Minus,
+  Plus,
+  Truck,
+  Shield,
+  RotateCcw,
+} from "lucide-react";
+import { ProductDetailPageSkeleton } from "@/components/products/ProductDetailPageSkeleton";
+import { hideLoader, showLoader } from "@/store/slices/loaderSlice";
+import { useToast } from "@/hooks/use-toast";
 
 export default function ProductDetailPage() {
   const params = useParams();
   const dispatch = useAppDispatch();
-  const { currentProduct, isLoading, error } = useAppSelector((state) => state.products);
+  const { toast } = useToast();
+  const { currentProduct, isLoading, error } = useAppSelector(
+    (state) => state.products
+  );
   const [selectedVariant, setSelectedVariant] = useState<string | null>(null);
   const [quantity, setQuantity] = useState(1);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
@@ -33,35 +46,45 @@ export default function ProductDetailPage() {
     }
   }, [currentProduct]);
 
-  const handleAddToCart = () => {
+  const handleAddToCart = async () => {
+    dispatch(showLoader("Product is adding to cart, please wait..."));
     if (selectedVariant) {
-      dispatch(createCheckout({
-        variantId: selectedVariant,
-        quantity,
-        email: 'user@example.com',
-      }));
+      await dispatch(
+        createCheckout({
+          variantId: selectedVariant,
+          quantity,
+          email: "user@example.com",
+        })
+      );
     }
+    toast({
+      title: "Success! ✅",
+      description: "Product added successfully to cart",
+      duration: 3000,
+    });
+    dispatch(hideLoader());
   };
 
   if (isLoading) {
-    return (
-      <ProductDetailPageSkeleton />
-    );
+    return <ProductDetailPageSkeleton />;
   }
 
   if (error || !currentProduct) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <p className="text-red-600 text-lg">{error || 'Product not found'}</p>
+        <p className="text-red-600 text-lg">{error || "Product not found"}</p>
       </div>
     );
   }
 
-  const imageUrl = currentProduct?.media?.length > 0 
-    ? currentProduct.media[selectedImageIndex].url 
-    : 'https://images.pexels.com/photos/1927259/pexels-photo-1927259.jpeg';
+  const imageUrl =
+    currentProduct?.media?.length > 0
+      ? currentProduct.media[selectedImageIndex].url
+      : "https://images.pexels.com/photos/1927259/pexels-photo-1927259.jpeg";
 
-  const selectedVariantData = currentProduct?.variants?.find(v => v.id === selectedVariant) || currentProduct.defaultVariant;
+  const selectedVariantData =
+    currentProduct?.variants?.find((v) => v.id === selectedVariant) ||
+    currentProduct.defaultVariant;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -85,7 +108,7 @@ export default function ProductDetailPage() {
                 priority
               />
             </motion.div>
-            
+
             {/* Thumbnail Gallery */}
             {currentProduct?.media?.length > 1 && (
               <div className="grid grid-cols-4 gap-2">
@@ -96,9 +119,9 @@ export default function ProductDetailPage() {
                     whileTap={{ scale: 0.95 }}
                     onClick={() => setSelectedImageIndex(index)}
                     className={`relative aspect-square overflow-hidden rounded-lg ${
-                      selectedImageIndex === index 
-                        ? 'ring-2 ring-[#CF00FF]' 
-                        : 'ring-1 ring-gray-200'
+                      selectedImageIndex === index
+                        ? "ring-2 ring-[#CF00FF]"
+                        : "ring-1 ring-gray-200"
                     }`}
                   >
                     <Image
@@ -125,15 +148,18 @@ export default function ProductDetailPage() {
                   {currentProduct.category.name}
                 </Badge>
               )}
-              
+
               <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
                 {currentProduct.name}
               </h1>
-              
+
               <div className="flex items-center space-x-4 mb-6">
                 <div className="flex items-center">
                   {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-5 h-5 fill-[#E033FF] text-[#E033FF]" />
+                    <Star
+                      key={i}
+                      className="w-5 h-5 fill-[#E033FF] text-[#E033FF]"
+                    />
                   ))}
                 </div>
                 <span className="text-gray-600">(4.8 stars)</span>
@@ -143,7 +169,8 @@ export default function ProductDetailPage() {
 
               {selectedVariantData && (
                 <div className="text-3xl font-bold text-[#B800E6] mb-6">
-                  ₹{selectedVariantData.pricing.price.gross.amount.toLocaleString()}
+                  ₹
+                  {selectedVariantData.pricing.price.gross.amount.toLocaleString()}
                   <span className="text-base font-normal text-gray-500 ml-2">
                     {selectedVariantData.pricing.price.gross.currency}
                   </span>
@@ -158,17 +185,21 @@ export default function ProductDetailPage() {
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.3 }}
               >
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Variants</h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                  Variants
+                </h3>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                   {currentProduct?.variants?.map((variant) => (
                     <Button
                       key={variant.id}
-                      variant={selectedVariant === variant.id ? "default" : "outline"}
+                      variant={
+                        selectedVariant === variant.id ? "default" : "outline"
+                      }
                       onClick={() => setSelectedVariant(variant.id)}
                       className={`text-sm ${
-                        selectedVariant === variant.id 
-                          ? 'bg-[#CF00FF] text-white' 
-                          : 'hover:border-[#E866FF]'
+                        selectedVariant === variant.id
+                          ? "bg-[#CF00FF] text-white"
+                          : "hover:border-[#E866FF]"
                       }`}
                     >
                       {variant.name}
@@ -184,7 +215,9 @@ export default function ProductDetailPage() {
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.4 }}
             >
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Quantity</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                Quantity
+              </h3>
               <div className="flex items-center space-x-4">
                 <div className="flex items-center border border-gray-300 rounded-lg">
                   <Button
@@ -195,7 +228,9 @@ export default function ProductDetailPage() {
                   >
                     <Minus className="w-4 h-4" />
                   </Button>
-                  <span className="px-4 py-2 text-lg font-semibold">{quantity}</span>
+                  <span className="px-4 py-2 text-lg font-semibold">
+                    {quantity}
+                  </span>
                   <Button
                     variant="ghost"
                     size="icon"
@@ -232,11 +267,14 @@ export default function ProductDetailPage() {
               className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-6 border-t border-gray-200"
             >
               {[
-                { icon: Truck, text: 'Free Shipping' },
-                { icon: Shield, text: 'Lifetime Warranty' },
-                { icon: RotateCcw, text: '30-Day Returns' },
+                { icon: Truck, text: "Free Shipping" },
+                { icon: Shield, text: "Lifetime Warranty" },
+                { icon: RotateCcw, text: "30-Day Returns" },
               ].map((feature, index) => (
-                <div key={index} className="flex items-center space-x-2 text-gray-600">
+                <div
+                  key={index}
+                  className="flex items-center space-x-2 text-gray-600"
+                >
                   <feature.icon className="w-5 h-5 text-[#CF00FF]" />
                   <span className="text-sm">{feature.text}</span>
                 </div>
@@ -257,25 +295,35 @@ export default function ProductDetailPage() {
               <TabsTrigger value="description">Description</TabsTrigger>
               <TabsTrigger value="specifications">Specifications</TabsTrigger>
             </TabsList>
-            
+
             <TabsContent value="description" className="mt-6">
               <div className="bg-white rounded-xl p-8 shadow-sm">
-                <h3 className="text-xl font-semibold text-gray-900 mb-4">Product Description</h3>
+                <h3 className="text-xl font-semibold text-gray-900 mb-4">
+                  Product Description
+                </h3>
                 <p className="text-gray-600 leading-relaxed">
-                  {currentProduct.description?.blocks || 'This exquisite piece represents the perfect blend of craftsmanship and elegance. Each detail has been meticulously designed to create a timeless piece that will be treasured for generations.'}
+                  {currentProduct.description?.blocks ||
+                    "This exquisite piece represents the perfect blend of craftsmanship and elegance. Each detail has been meticulously designed to create a timeless piece that will be treasured for generations."}
                 </p>
               </div>
             </TabsContent>
-            
+
             <TabsContent value="specifications" className="mt-6">
               <div className="bg-white rounded-xl p-8 shadow-sm">
-                <h3 className="text-xl font-semibold text-gray-900 mb-4">Specifications</h3>
+                <h3 className="text-xl font-semibold text-gray-900 mb-4">
+                  Specifications
+                </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {currentProduct.attributes.map((attr) => (
-                    <div key={attr.attribute.id} className="flex justify-between py-2 border-b border-gray-100">
-                      <span className="font-medium text-gray-900">{attr.attribute.name}:</span>
+                    <div
+                      key={attr.attribute.id}
+                      className="flex justify-between py-2 border-b border-gray-100"
+                    >
+                      <span className="font-medium text-gray-900">
+                        {attr.attribute.name}:
+                      </span>
                       <span className="text-gray-600">
-                        {attr.values.map(v => v.name).join(', ')}
+                        {attr.values.map((v) => v.name).join(", ")}
                       </span>
                     </div>
                   ))}

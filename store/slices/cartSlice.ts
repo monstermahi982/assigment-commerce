@@ -1,4 +1,6 @@
+import { useAppDispatch } from "@/lib/hooks";
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
+import { hideLoader } from "./loaderSlice";
 
 interface CartItem {
   id: string;

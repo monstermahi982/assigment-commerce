@@ -1,12 +1,15 @@
-'use client';
+"use client";
 
-import { motion } from 'framer-motion';
-import Link from 'next/link';
-import Image from 'next/image';
-import { ShoppingBag, Star } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { useAppDispatch } from '@/lib/hooks';
-import { createCheckout } from '@/store/slices/cartSlice';
+import { motion } from "framer-motion";
+import Link from "next/link";
+import Image from "next/image";
+import { ShoppingBag, Star } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useAppDispatch } from "@/lib/hooks";
+import { createCheckout } from "@/store/slices/cartSlice";
+import { hideLoader, showLoader } from "@/store/slices/loaderSlice";
+import { useToast } from "@/hooks/use-toast";
+import { useEffect } from "react";
 
 interface Product {
   id: string;
@@ -42,30 +45,40 @@ interface Product {
 
 interface ProductCardProps {
   product: Product;
-  viewMode: 'grid' | 'list';
+  viewMode: "grid" | "list";
 }
 
 export function ProductCard({ product, viewMode }: ProductCardProps) {
   const dispatch = useAppDispatch();
+  const { toast } = useToast();
 
-  const handleAddToCart = (e: React.MouseEvent) => {
+  const handleAddToCart = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    
+    dispatch(showLoader("Product is adding to cart, please wait..."));
     if (product.defaultVariant) {
-      dispatch(createCheckout({
-        variantId: product.defaultVariant.id,
-        quantity: 1,
-        email: 'user@example.com',
-      }));
+      await dispatch(
+        createCheckout({
+          variantId: product.defaultVariant.id,
+          quantity: 1,
+          email: "user@example.com",
+        })
+      );
+      toast({
+        title: "Success! ✅",
+        description: "Product added successfully to cart",
+        duration: 3000,
+      });
+      dispatch(hideLoader());
     }
   };
 
-  const imageUrl = product?.media?.length > 0 
-    ? product.media[0].url 
-    : 'https://images.pexels.com/photos/1927259/pexels-photo-1927259.jpeg';
+  const imageUrl =
+    product?.media?.length > 0
+      ? product.media[0].url
+      : "https://images.pexels.com/photos/1927259/pexels-photo-1927259.jpeg";
 
-  if (viewMode === 'list') {
+  if (viewMode === "list") {
     return (
       <Link href={`/products/${product.slug}`}>
         <motion.div
@@ -80,7 +93,7 @@ export function ProductCard({ product, viewMode }: ProductCardProps) {
               className="object-cover group-hover:scale-105 transition-transform duration-300"
             />
           </div>
-          
+
           <div className="flex-1 flex flex-col justify-between">
             <div>
               <div className="flex items-start justify-between mb-2">
@@ -88,30 +101,35 @@ export function ProductCard({ product, viewMode }: ProductCardProps) {
                   {product.name}
                 </h3>
               </div>
-              
+
               {product.category && (
-                <p className="text-sm text-gray-500 mb-2">{product.category.name}</p>
+                <p className="text-sm text-gray-500 mb-2">
+                  {product.category.name}
+                </p>
               )}
-              
-              <p className="text-gray-600 line-clamp-3 mb-4">{product.description}</p>
-              
+
+              <p className="text-gray-600 line-clamp-3 mb-4">
+                {product.description}
+              </p>
+
               <div className="flex items-center space-x-2 mb-4">
                 <div className="flex items-center">
-                    <Star className="w-4 h-4 fill-[#d0d61f] text-[#d0d61f]" />
+                  <Star className="w-4 h-4 fill-[#d0d61f] text-[#d0d61f]" />
                 </div>
                 <span className="text-sm text-gray-500">(4.8)</span>
               </div>
             </div>
-            
+
             <div className="flex items-center justify-between">
               <div>
                 {product.defaultVariant && (
                   <p className="text-2xl font-bold text-[#2825e0]">
-                    ₹{product.defaultVariant?.pricing?.price?.gross?.amount.toLocaleString()}
+                    ₹
+                    {product.defaultVariant?.pricing?.price?.gross?.amount.toLocaleString()}
                   </p>
                 )}
               </div>
-              
+
               <Button
                 onClick={handleAddToCart}
                 className="bg-[#CF00FF] hover:bg-[#B800E6] text-white"
@@ -140,7 +158,7 @@ export function ProductCard({ product, viewMode }: ProductCardProps) {
             fill
             className="object-cover group-hover:scale-110 transition-transform duration-300"
           />
-          
+
           {/* Overlay Actions */}
           <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center space-x-2">
             <Button
@@ -168,10 +186,10 @@ export function ProductCard({ product, viewMode }: ProductCardProps) {
           <h3 className="text-lg font-semibold text-gray-900 mb-2 group-hover:text-[#B800E6] transition-colors line-clamp-2">
             {product.name}
           </h3>
-          
+
           <div className="flex items-center space-x-2 mb-3">
             <div className="flex items-center">
-                <Star className="w-4 h-4 fill-[#d4bc1d] text-[#d4bc1d]" />
+              <Star className="w-4 h-4 fill-[#d4bc1d] text-[#d4bc1d]" />
             </div>
             <span className="text-sm text-gray-500">(4.8)</span>
           </div>
@@ -179,10 +197,11 @@ export function ProductCard({ product, viewMode }: ProductCardProps) {
           <div className="flex items-center justify-between">
             {product.defaultVariant && (
               <p className="text-xl font-bold text-[#0051e6]">
-                ₹{product.defaultVariant?.pricing?.price?.gross?.amount.toLocaleString()}
+                ₹
+                {product.defaultVariant?.pricing?.price?.gross?.amount.toLocaleString()}
               </p>
             )}
-            
+
             <div className="flex items-center space-x-1">
               <div className="w-3 h-3 bg-green-500 rounded-full"></div>
               <span className="text-sm text-gray-500">In Stock</span>

@@ -10,6 +10,7 @@ import ProductFilters from "@/components/products/ProductFilters";
 import { Filter, Grid, List } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ProductCardSkeleton } from "@/components/products/ProductCardSkeleton";
+import { showLoader, hideLoader } from "@/store/slices/loaderSlice";
 
 export default function ProductDetailContent() {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
