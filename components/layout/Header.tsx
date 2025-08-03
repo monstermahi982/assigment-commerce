@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { ShoppingBag, User, Search, Menu, X, Heart } from "lucide-react";
+import { ShoppingBag, User, Search, Menu, X } from "lucide-react";
 import { useAppSelector, useAppDispatch } from "@/lib/hooks";
 import { logout, loadUserFromStorage } from "@/store/slices/authSlice";
 import { Button } from "@/components/ui/button";

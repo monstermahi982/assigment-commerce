@@ -200,7 +200,7 @@ export default function LoginPage() {
           {/* Footer Links */}
           <div className="mt-8 text-center">
             <p className="text-gray-600">
-              Don't have an account?{" "}
+              Don{"'"}t have an account?{" "}
               <button className="text-[#B800E6] hover:text-[#9A00CC] font-medium">
                 Contact Support
               </button>

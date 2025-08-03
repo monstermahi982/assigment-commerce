@@ -139,7 +139,7 @@ export default function ProductsPage() {
                   //   key={index}
                   //   className="bg-white rounded-xl h-96 animate-pulse"
                   // />
-                  <ProductCardSkeleton viewMode={'grid'} />
+                  <ProductCardSkeleton key={index} viewMode={'grid'} />
                 ))}
               </div>
             ) : error ? (

@@ -28,7 +28,7 @@ interface Product {
   id: string;
   name: string;
   slug: string;
-  description?: string;
+  description?: any;
   defaultVariant?: ProductVariant;
   variants: ProductVariant[];
   media: Array<{

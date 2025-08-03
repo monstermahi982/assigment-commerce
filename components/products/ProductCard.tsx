@@ -3,7 +3,7 @@
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Heart, ShoppingBag, Star } from 'lucide-react';
+import { ShoppingBag, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAppDispatch } from '@/lib/hooks';
 import { createCheckout } from '@/store/slices/cartSlice';
@@ -12,7 +12,7 @@ interface Product {
   id: string;
   name: string;
   slug: string;
-  description?: any;
+  description?: React.ReactNode;
   defaultVariant?: {
     id: string;
     name: string;

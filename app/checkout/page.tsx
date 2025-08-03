@@ -21,7 +21,7 @@ const addressSchema = z.object({
   city: z.string().min(1, 'City is required'),
   countryArea: z.string().min(1, 'State is required'),
   postalCode: z.string().min(1, 'Postal code is required'),
-  country: z.string().default('IN'),
+  country: z.string(),
 });
 
 type AddressForm = z.infer<typeof addressSchema>;
@@ -338,7 +338,7 @@ export default function CheckoutPage() {
                 
                 <h2 className="text-2xl font-bold text-gray-900 mb-4">Order Confirmed!</h2>
                 <p className="text-gray-600 mb-8">
-                  Thank you for your purchase. We'll send you a confirmation email shortly.
+                  Thank you for your purchase. We{"'"}ll send you a confirmation email shortly.
                 </p>
                 
                 <div className="bg-gray-50 rounded-lg p-4 mb-8">

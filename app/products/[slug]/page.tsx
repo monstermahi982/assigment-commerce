@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { useParams } from 'next/navigation';
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
@@ -10,7 +10,7 @@ import { createCheckout } from '@/store/slices/cartSlice';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Heart, ShoppingBag, Star, Minus, Plus, Truck, Shield, RotateCcw } from 'lucide-react';
+import { ShoppingBag, Star, Minus, Plus, Truck, Shield, RotateCcw } from 'lucide-react';
 import { ProductDetailPageSkeleton } from '@/components/products/ProductDetailPageSkeleton';
 
 export default function ProductDetailPage() {

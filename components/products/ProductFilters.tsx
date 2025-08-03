@@ -114,12 +114,6 @@ export default function ProductFilters({
     });
   };
 
-  const handleAvailabilityChange = (checked: boolean) => {
-    setLocalFilters((prev) => ({
-      ...prev,
-    }));
-  };
-
   const applyFilters = () => {
     onFiltersChange(localFilters);
   };
