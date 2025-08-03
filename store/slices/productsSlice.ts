@@ -78,9 +78,11 @@ export const fetchProducts = createAsyncThunk(
   async ({
     filters,
     first = 12,
+    search,
   }: {
     filters?: Record<string, string[]>;
     first?: number;
+    search?: string;
   }) => {
     const attributeFilters = filters
       ? Object.entries(filters).map(([slug, values]) => ({
@@ -88,6 +90,14 @@ export const fetchProducts = createAsyncThunk(
           values,
         }))
       : [];
+
+    const filterObject: any = {};
+    if (attributeFilters.length > 0) {
+      filterObject.attributes = attributeFilters;
+    }
+    if (search && search.trim()) {
+      filterObject.search = search.trim();
+    }
 
     const response = await fetch(
       "https://saleor-kombee.onrender.com/graphql/",
@@ -142,7 +152,7 @@ export const fetchProducts = createAsyncThunk(
         `,
           variables: {
             first,
-            filter: { attributes: attributeFilters },
+            filter: filterObject,
           },
         }),
       }
