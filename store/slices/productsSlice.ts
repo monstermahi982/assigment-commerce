@@ -98,13 +98,11 @@ export const fetchProducts = createAsyncThunk(
         },
         body: JSON.stringify({
           query: `
-          query GetProducts($first: Int!, $filters: [AttributeInput!]) {
+          query GetProducts($first: Int!, $filter: ProductFilterInput) {
             products(
               first: $first,
               channel: "online-inr",
-              filter: {
-                attributes: $filters
-              }
+              filter: $filter
             ) {
               edges {
                 node {
@@ -144,8 +142,7 @@ export const fetchProducts = createAsyncThunk(
         `,
           variables: {
             first,
-            filter: filters,
-            channel: "online-inr",
+            filter: { attributes: attributeFilters },
           },
         }),
       }

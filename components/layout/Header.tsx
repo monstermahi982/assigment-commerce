@@ -22,7 +22,7 @@ export function Header() {
   const debouncedSearch = useCallback(
     debounce((value: string) => {
       if (value.trim()) {
-        dispatch(fetchProducts({ filters: { search: value } }));
+        dispatch(fetchProducts({ filters: { search: [value] } }));
       }
     }, 500),
     []

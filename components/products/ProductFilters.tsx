@@ -2,15 +2,6 @@ import { useState } from "react";
 import { X } from "lucide-react";
 
 // Filter structure for attributes
-interface AttributeFilter {
-  slug: string;
-  values: string[];
-}
-
-interface ProductFilters {
-  attributes: AttributeFilter[];
-}
-
 interface FilterOption {
   slug: string;
   name: string;
@@ -21,8 +12,8 @@ interface FilterOption {
 }
 
 interface ProductFiltersProps {
-  onFiltersChange: (filters: ProductFilters) => void;
-  initialFilters?: ProductFilters;
+  onFiltersChange: (filters: Record<string, string[]>) => void;
+  initialFilters?: Record<string, string[]>;
 }
 
 const filterOptions: FilterOption[] = [
@@ -86,10 +77,9 @@ export default function ProductFilters({
   onFiltersChange,
   initialFilters,
 }: ProductFiltersProps) {
-  const [localFilters, setLocalFilters] = useState<ProductFilters>({
-    attributes: [],
-    ...initialFilters,
-  });
+  const [localFilters, setLocalFilters] = useState<Record<string, string[]>>(
+    initialFilters || {}
+  );
 
   const handleAttributeChange = (
     attributeSlug: string,
@@ -97,45 +87,30 @@ export default function ProductFilters({
     checked: boolean
   ) => {
     setLocalFilters((prev) => {
-      const attributes = [...prev.attributes];
-      const existingAttrIndex = attributes.findIndex(
-        (attr) => attr.slug === attributeSlug
-      );
+      const newFilters = { ...prev };
 
-      if (existingAttrIndex >= 0) {
-        // Attribute already exists, update its values
-        const existingAttr = attributes[existingAttrIndex];
-
-        if (checked) {
-          // Add value if not already present
-          if (!existingAttr.values.includes(valueSlug)) {
-            attributes[existingAttrIndex] = {
-              ...existingAttr,
-              values: [...existingAttr.values, valueSlug],
-            };
-          }
-        } else {
-          // Remove value
-          const newValues = existingAttr.values.filter((v) => v !== valueSlug);
-          if (newValues.length === 0) {
-            // Remove entire attribute if no values left
-            attributes.splice(existingAttrIndex, 1);
-          } else {
-            attributes[existingAttrIndex] = {
-              ...existingAttr,
-              values: newValues,
-            };
+      if (checked) {
+        // Add value to attribute
+        if (!newFilters[attributeSlug]) {
+          newFilters[attributeSlug] = [];
+        }
+        if (!newFilters[attributeSlug].includes(valueSlug)) {
+          newFilters[attributeSlug] = [...newFilters[attributeSlug], valueSlug];
+        }
+      } else {
+        // Remove value from attribute
+        if (newFilters[attributeSlug]) {
+          newFilters[attributeSlug] = newFilters[attributeSlug].filter(
+            (v) => v !== valueSlug
+          );
+          // Remove attribute if no values left
+          if (newFilters[attributeSlug].length === 0) {
+            delete newFilters[attributeSlug];
           }
         }
-      } else if (checked) {
-        // Create new attribute entry
-        attributes.push({
-          slug: attributeSlug,
-          values: [valueSlug],
-        });
       }
 
-      return { ...prev, attributes };
+      return newFilters;
     });
   };
 
@@ -150,9 +125,7 @@ export default function ProductFilters({
   };
 
   const clearAllFilters = () => {
-    const clearedFilters: ProductFilters = {
-      attributes: [],
-    };
+    const clearedFilters: Record<string, string[]> = {};
     setLocalFilters(clearedFilters);
     onFiltersChange(clearedFilters);
   };
@@ -161,18 +134,14 @@ export default function ProductFilters({
     attributeSlug: string,
     valueSlug: string
   ) => {
-    const attribute = localFilters.attributes.find(
-      (attr) => attr.slug === attributeSlug
-    );
-    return attribute?.values.includes(valueSlug) || false;
+    return localFilters[attributeSlug]?.includes(valueSlug) || false;
   };
 
-  const hasActiveFilters =
-    localFilters.attributes.length > 0 || !localFilters.isAvailableForPurchase;
+  const hasActiveFilters = Object.keys(localFilters).length > 0;
 
   const getActiveFiltersCount = () => {
-    return localFilters.attributes.reduce(
-      (count, attr) => count + attr.values.length,
+    return Object.values(localFilters).reduce(
+      (count, values) => count + values.length,
       0
     );
   };
@@ -202,10 +171,7 @@ export default function ProductFilters({
       <div className="space-y-6">
         {/* Attribute Filters */}
         {filterOptions.map((filterOption) => {
-          const activeCount =
-            localFilters.attributes.find(
-              (attr) => attr.slug === filterOption.slug
-            )?.values.length || 0;
+          const activeCount = localFilters[filterOption.slug]?.length || 0;
 
           return (
             <div key={filterOption.slug} className="space-y-3">
@@ -287,20 +253,20 @@ export default function ProductFilters({
         </button>
 
         {/* Selected Filters Preview */}
-        {localFilters.attributes.length > 0 && (
+        {Object.keys(localFilters).length > 0 && (
           <div className="space-y-2">
             <p className="text-xs text-gray-500 font-medium">Selected:</p>
             <div className="flex flex-wrap gap-1">
-              {localFilters.attributes.map((attr) =>
-                attr.values.map((value) => (
+              {Object.entries(localFilters).map(([attrSlug, values]) =>
+                values.map((value) => (
                   <span
-                    key={`${attr.slug}-${value}`}
+                    key={`${attrSlug}-${value}`}
                     className="px-2 py-1 bg-purple-50 text-purple-700 text-xs rounded-md border border-purple-200"
                   >
-                    {filterOptions.find((opt) => opt.slug === attr.slug)?.name}:{" "}
+                    {filterOptions.find((opt) => opt.slug === attrSlug)?.name}:{" "}
                     {
                       filterOptions
-                        .find((opt) => opt.slug === attr.slug)
+                        .find((opt) => opt.slug === attrSlug)
                         ?.values.find((val) => val.slug === value)?.name
                     }
                   </span>
