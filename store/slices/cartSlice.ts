@@ -90,7 +90,7 @@ export const createCheckout = createAsyncThunk(
     email: string;
   }) => {
     const response = await fetch(
-      "https://saleor-kombee.onrender.com/graphql/",
+      `${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:8000"}/graphql`,
       {
         method: "POST",
         headers: {
@@ -174,7 +174,7 @@ export const updateShippingAddress = createAsyncThunk(
     shippingAddress: ShippingAddress;
   }) => {
     const response = await fetch(
-      "https://saleor-kombee.onrender.com/graphql/",
+      `${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:8000"}/graphql`,
       {
         method: "POST",
         headers: {

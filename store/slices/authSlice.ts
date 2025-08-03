@@ -26,7 +26,7 @@ export const loginUser = createAsyncThunk(
   "auth/loginUser",
   async ({ email, password }: { email: string; password: string }) => {
     const response = await fetch(
-      "https://saleor-kombee.onrender.com/graphql/",
+      `${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:8000"}/graphql`,
       {
         method: "POST",
         headers: {
