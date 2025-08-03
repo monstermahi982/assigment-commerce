@@ -1,12 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
+import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { useAppDispatch, useAppSelector } from "@/lib/hooks";
-import {
-  fetchProducts,
-  setFilters,
-} from "@/store/slices/productsSlice";
+import { useAppDispatch, useAppSelector, useInfiniteScroll } from "@/lib/hooks";
+import { fetchProducts, setFilters } from "@/store/slices/productsSlice";
 import { ProductCard } from "@/components/products/ProductCard";
 import ProductFilters from "@/components/products/ProductFilters";
 import { Filter, Grid, List } from "lucide-react";
@@ -16,17 +14,48 @@ export default function ProductsPage() {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [showFilters, setShowFilters] = useState(false);
   const dispatch = useAppDispatch();
-  const { products, isLoading, error, filters } = useAppSelector(
-    (state) => state.products
-  );
+  const searchParams = useSearchParams();
+  const { products, isLoading, error, filters, hasMore, endCursor } =
+    useAppSelector((state) => state.products);
 
   const handleFiltersChange = (data: Record<string, string[]>) => {
     dispatch(fetchProducts({ filters: data }));
-  }
+  };
+
+  const loadMore = useCallback(() => {
+    if (!isLoading && hasMore) {
+      const searchQuery = searchParams.get("search");
+      if (searchQuery) {
+        dispatch(
+          fetchProducts({
+            search: searchQuery,
+            after: endCursor || undefined,
+            append: true,
+          })
+        );
+      } else {
+        dispatch(
+          fetchProducts({
+            filters,
+            after: endCursor || undefined,
+            append: true,
+          })
+        );
+      }
+    }
+  }, [dispatch, isLoading, hasMore, endCursor, searchParams, filters]);
+
+  const lastElementRef = useInfiniteScroll(hasMore, isLoading, loadMore);
 
   useEffect(() => {
-    dispatch(fetchProducts({ filters }));
-  }, [dispatch, filters]);
+    // Check for search parameter in URL
+    const searchQuery = searchParams.get("search");
+    if (searchQuery) {
+      dispatch(fetchProducts({ search: searchQuery }));
+    } else {
+      dispatch(fetchProducts({ filters }));
+    }
+  }, [dispatch, filters, searchParams]);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -39,10 +68,16 @@ export default function ProductsPage() {
         >
           <div>
             <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
-              Our Collection
+              {searchParams.get("search")
+                ? `Search Results for "${searchParams.get("search")}"`
+                : "Our Collection"}
             </h1>
             <p className="text-gray-600">
-              Discover {products.length} exquisite pieces crafted for you
+              {searchParams.get("search")
+                ? `Found ${
+                    products.length
+                  } products matching "${searchParams.get("search")}"`
+                : `Discover ${products.length} exquisite pieces crafted for you`}
             </p>
           </div>
 
@@ -53,9 +88,7 @@ export default function ProductsPage() {
                 variant={viewMode === "grid" ? "default" : "ghost"}
                 size="sm"
                 onClick={() => setViewMode("grid")}
-                className={
-                  viewMode === "grid" ? "bg-[#CF00FF] text-white" : ""
-                }
+                className={viewMode === "grid" ? "bg-[#CF00FF] text-white" : ""}
               >
                 <Grid className="w-4 h-4" />
               </Button>
@@ -63,9 +96,7 @@ export default function ProductsPage() {
                 variant={viewMode === "list" ? "default" : "ghost"}
                 size="sm"
                 onClick={() => setViewMode("list")}
-                className={
-                  viewMode === "list" ? "bg-[#CF00FF] text-white" : ""
-                }
+                className={viewMode === "list" ? "bg-[#CF00FF] text-white" : ""}
               >
                 <List className="w-4 h-4" />
               </Button>
@@ -131,6 +162,11 @@ export default function ProductsPage() {
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -50 }}
                       transition={{ duration: 0.4, delay: index * 0.05 }}
+                      ref={
+                        index === products.length - 1
+                          ? lastElementRef
+                          : undefined
+                      }
                     >
                       <ProductCard product={product} viewMode={viewMode} />
                     </motion.div>
@@ -155,6 +191,35 @@ export default function ProductsPage() {
                 >
                   Clear Filters
                 </Button>
+              </motion.div>
+            )}
+
+            {/* Loading more indicator */}
+            {isLoading && products.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="flex justify-center py-8"
+              >
+                <div className="flex items-center space-x-2">
+                  <div className="w-6 h-6 border-2 border-[#CF00FF] border-t-transparent rounded-full animate-spin"></div>
+                  <span className="text-gray-600">
+                    Loading more products...
+                  </span>
+                </div>
+              </motion.div>
+            )}
+
+            {/* End of results indicator */}
+            {!isLoading && !hasMore && products.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="text-center py-8"
+              >
+                <p className="text-gray-500 text-sm">
+                  You&apos;ve reached the end of the results
+                </p>
               </motion.div>
             )}
           </div>

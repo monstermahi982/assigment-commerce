@@ -62,6 +62,7 @@ interface ProductsState {
   error: string | null;
   hasMore: boolean;
   filters: Record<string, string[]>;
+  endCursor: string | null;
 }
 
 const initialState: ProductsState = {
@@ -71,6 +72,7 @@ const initialState: ProductsState = {
   error: null,
   hasMore: true,
   filters: {},
+  endCursor: null,
 };
 
 export const fetchProducts = createAsyncThunk(
@@ -79,10 +81,14 @@ export const fetchProducts = createAsyncThunk(
     filters,
     first = 12,
     search,
+    after,
+    append = false,
   }: {
     filters?: Record<string, string[]>;
     first?: number;
     search?: string;
+    after?: string;
+    append?: boolean;
   }) => {
     const attributeFilters = filters
       ? Object.entries(filters).map(([slug, values]) => ({
@@ -108,13 +114,19 @@ export const fetchProducts = createAsyncThunk(
         },
         body: JSON.stringify({
           query: `
-          query GetProducts($first: Int!, $filter: ProductFilterInput) {
+          query GetProducts($first: Int!, $after: String,  $filter: ProductFilterInput) {
             products(
               first: $first,
+              after: $after,
               channel: "online-inr",
               filter: $filter
             ) {
+              pageInfo {
+                hasNextPage
+                endCursor
+              }
               edges {
+                cursor
                 node {
                   id
                   name
@@ -152,6 +164,7 @@ export const fetchProducts = createAsyncThunk(
         `,
           variables: {
             first,
+            after,
             filter: filterObject,
           },
         }),
@@ -159,7 +172,11 @@ export const fetchProducts = createAsyncThunk(
     );
 
     const data = await response.json();
-    return data.data.products.edges.map((edge: any) => edge.node);
+    return {
+      products: data.data.products.edges.map((edge: any) => edge.node),
+      pageInfo: data.data.products.pageInfo,
+      append,
+    };
   }
 );
 
@@ -290,7 +307,13 @@ const productsSlice = createSlice({
       })
       .addCase(fetchProducts.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.products = action.payload;
+        if (action.payload.append) {
+          state.products = [...state.products, ...action.payload.products];
+        } else {
+          state.products = action.payload.products;
+        }
+        state.hasMore = action.payload.pageInfo.hasNextPage;
+        state.endCursor = action.payload.pageInfo.endCursor;
       })
       .addCase(fetchProducts.rejected, (state, action) => {
         state.isLoading = false;
