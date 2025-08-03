@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Heart, ShoppingBag, Star, Minus, Plus, Truck, Shield, RotateCcw } from 'lucide-react';
+import { ProductDetailPageSkeleton } from '@/components/products/ProductDetailPageSkeleton';
 
 export default function ProductDetailPage() {
   const params = useParams();
@@ -44,9 +45,7 @@ export default function ProductDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-[#CF00FF] border-t-transparent rounded-full animate-spin" />
-      </div>
+      <ProductDetailPageSkeleton />
     );
   }
 

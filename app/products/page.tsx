@@ -9,6 +9,7 @@ import { ProductCard } from "@/components/products/ProductCard";
 import ProductFilters from "@/components/products/ProductFilters";
 import { Filter, Grid, List } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ProductCardSkeleton } from "@/components/products/ProductCardSkeleton";
 
 export default function ProductsPage() {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
@@ -134,10 +135,11 @@ export default function ProductsPage() {
             {isLoading ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {[...Array(8)].map((_, index) => (
-                  <div
-                    key={index}
-                    className="bg-white rounded-xl h-96 animate-pulse"
-                  />
+                  // <div
+                  //   key={index}
+                  //   className="bg-white rounded-xl h-96 animate-pulse"
+                  // />
+                  <ProductCardSkeleton viewMode={'grid'} />
                 ))}
               </div>
             ) : error ? (
