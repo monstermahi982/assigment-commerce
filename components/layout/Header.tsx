@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { ShoppingBag, User, Search, Menu, X, Heart } from "lucide-react";
@@ -8,6 +8,8 @@ import { useAppSelector, useAppDispatch } from "@/lib/hooks";
 import { logout, loadUserFromStorage } from "@/store/slices/authSlice";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import debounce from "lodash.debounce";
+import { fetchProducts } from "@/store/slices/productsSlice";
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -15,6 +17,22 @@ export function Header() {
   const { isAuthenticated, user } = useAppSelector((state) => state.auth);
   const { items } = useAppSelector((state) => state?.cart || "");
   const dispatch = useAppDispatch();
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const debouncedSearch = useCallback(
+    debounce((value: string) => {
+      if (value.trim()) {
+        dispatch(fetchProducts({ filters: { search: value } }));
+      }
+    }, 500),
+    []
+  );
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+    debouncedSearch(value);
+  };
 
   useEffect(() => {
     dispatch(loadUserFromStorage());
@@ -66,6 +84,8 @@ export function Header() {
                 type="text"
                 placeholder="Search products..."
                 className="pl-10 bg-gray-50 border-gray-200 focus:border-[#CF00FF] focus:ring-[#CF00FF]"
+                value={searchTerm}
+                onChange={handleInputChange}
               />
             </div>
           </div>
@@ -155,6 +175,8 @@ export function Header() {
                   type="text"
                   placeholder="Search products..."
                   className="pl-10 bg-gray-50 border-gray-200 focus:border-[#CF00FF] focus:ring-[#CF00FF]"
+                  value={searchTerm}
+                  onChange={handleInputChange}
                 />
               </div>
             </motion.div>
